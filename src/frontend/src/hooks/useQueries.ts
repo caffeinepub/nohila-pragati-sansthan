@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { HelpRequest, QRCodeData, UserProfile } from "../backend.d";
+import type {
+  HelpRequest,
+  PendingRegistration,
+  QRCodeData,
+  UserProfile,
+} from "../backend";
 import { useActor } from "./useActor";
+
+export type { PendingRegistration };
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -127,5 +134,100 @@ export function useGetAllHelpRequests() {
       return actor.getAllHelpRequests();
     },
     enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetAllMembers() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Array<[unknown, UserProfile]>>({
+    queryKey: ["allMembers"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllMembers();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useSubmitPendingRegistration() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      name,
+      phoneNumber,
+      role,
+      utrNumber,
+    }: {
+      name: string;
+      phoneNumber: string;
+      role: string;
+      utrNumber: string;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.submitPendingRegistration(
+        name,
+        phoneNumber,
+        role,
+        utrNumber,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myPendingRegistration"] });
+    },
+  });
+}
+
+export function useGetMyPendingRegistration() {
+  const { actor, isFetching } = useActor();
+  return useQuery<PendingRegistration | null>({
+    queryKey: ["myPendingRegistration"],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getMyPendingRegistration();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetAllPendingRegistrations() {
+  const { actor, isFetching } = useActor();
+  return useQuery<PendingRegistration[]>({
+    queryKey: ["allPendingRegistrations"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllPendingRegistrations();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useApprovePendingRegistration() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (utrNumber: string) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.approvePendingRegistration(utrNumber);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allPendingRegistrations"] });
+      queryClient.invalidateQueries({ queryKey: ["allMembers"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
+  });
+}
+
+export function useRejectPendingRegistration() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (utrNumber: string) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.rejectPendingRegistration(utrNumber);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allPendingRegistrations"] });
+    },
   });
 }

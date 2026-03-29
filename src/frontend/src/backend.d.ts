@@ -25,6 +25,14 @@ export interface HelpRequest {
     message: string;
     phone: string;
 }
+export interface PendingRegistration {
+    principal: any;
+    name: string;
+    phoneNumber: string;
+    role: string;
+    utrNumber: string;
+    submittedAt: bigint;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -55,4 +63,9 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setQRCodeData(url: string, description: string): Promise<void>;
     submitHelpRequest(name: string, phone: string, message: string): Promise<bigint>;
+    submitPendingRegistration(name: string, phoneNumber: string, role: string, utrNumber: string): Promise<void>;
+    getAllPendingRegistrations(): Promise<Array<PendingRegistration>>;
+    approvePendingRegistration(utrNumber: string): Promise<void>;
+    rejectPendingRegistration(utrNumber: string): Promise<void>;
+    getMyPendingRegistration(): Promise<PendingRegistration | null>;
 }

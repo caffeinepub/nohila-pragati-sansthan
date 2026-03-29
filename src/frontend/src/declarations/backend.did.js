@@ -31,6 +31,14 @@ export const QRCodeData = IDL.Record({
   'description' : IDL.Text,
   'updatedAt' : IDL.Int,
 });
+export const PendingRegistration = IDL.Record({
+  'principal' : IDL.Principal,
+  'name' : IDL.Text,
+  'phoneNumber' : IDL.Text,
+  'role' : IDL.Text,
+  'utrNumber' : IDL.Text,
+  'submittedAt' : IDL.Int,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -80,6 +88,11 @@ export const idlService = IDL.Service({
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setQRCodeData' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'submitHelpRequest' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
+  'submitPendingRegistration' : IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text], [], []),
+  'getAllPendingRegistrations' : IDL.Func([], [IDL.Vec(PendingRegistration)], ['query']),
+  'approvePendingRegistration' : IDL.Func([IDL.Text], [], []),
+  'rejectPendingRegistration' : IDL.Func([IDL.Text], [], []),
+  'getMyPendingRegistration' : IDL.Func([], [IDL.Opt(PendingRegistration)], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -107,6 +120,14 @@ export const idlFactory = ({ IDL }) => {
     'url' : IDL.Text,
     'description' : IDL.Text,
     'updatedAt' : IDL.Int,
+  });
+  const PendingRegistration = IDL.Record({
+    'principal' : IDL.Principal,
+    'name' : IDL.Text,
+    'phoneNumber' : IDL.Text,
+    'role' : IDL.Text,
+    'utrNumber' : IDL.Text,
+    'submittedAt' : IDL.Int,
   });
   
   return IDL.Service({
@@ -161,6 +182,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'submitPendingRegistration' : IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text], [], []),
+    'getAllPendingRegistrations' : IDL.Func([], [IDL.Vec(PendingRegistration)], ['query']),
+    'approvePendingRegistration' : IDL.Func([IDL.Text], [], []),
+    'rejectPendingRegistration' : IDL.Func([IDL.Text], [], []),
+    'getMyPendingRegistration' : IDL.Func([], [IDL.Opt(PendingRegistration)], ['query']),
   });
 };
 

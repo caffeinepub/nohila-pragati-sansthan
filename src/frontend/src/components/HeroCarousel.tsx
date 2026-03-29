@@ -5,29 +5,32 @@ import { useCallback, useEffect, useState } from "react";
 
 const slides = [
   {
-    image: "/assets/generated/hero-slide1.dim_1400x600.jpg",
-    title: "Breaking the Silence",
-    subtitle: "on Domestic Violence",
+    image:
+      "/assets/uploads/whatsapp_image_2026-03-29_at_3.12.48_pm-019d390d-6bb7-7598-8a87-3574f790bbd2-4.jpeg",
+    title: "Ek Kranti Layegi Shanti",
+    subtitle: "Mahila Pragati Sansthan",
     description:
-      "Every survivor deserves to be heard, protected, and supported. We stand with you.",
+      "A registered NGO fighting for women's rights and dignity across India. Regd. No. IV-190201223/2022.",
     cta: "Get Help Now",
     ctaHref: "#help",
     secondary: "Learn About Us",
     secondaryHref: "#about",
   },
   {
-    image: "/assets/generated/hero-slide2.dim_1400x600.jpg",
-    title: "Support, Shelter",
-    subtitle: "& Safety for Survivors",
+    image:
+      "/assets/uploads/whatsapp_image_2026-03-29_at_3.12.48_pm_1-019d390d-690e-70cc-a762-a947af0590af-2.jpeg",
+    title: "Standing Together",
+    subtitle: "For Every Survivor",
     description:
-      "Safe spaces, legal aid, medical support, and rehabilitation — all under one roof.",
+      "Our community of volunteers and members works tirelessly to support women across India.",
     cta: "Our Services",
     ctaHref: "#services",
     secondary: "Donate",
-    secondaryHref: "#contact",
+    secondaryHref: "/donate",
   },
   {
-    image: "/assets/generated/hero-slide3.dim_1400x600.jpg",
+    image:
+      "/assets/uploads/whatsapp_image_2026-03-29_at_3.12.47_pm-019d390d-698c-76af-99d0-ec01f38d6daa-3.jpeg",
     title: "Join Us in Creating",
     subtitle: "a Violence-Free India",
     description:
@@ -38,7 +41,8 @@ const slides = [
     secondaryHref: "#about",
   },
   {
-    image: "/assets/generated/hero-slide1.dim_1400x600.jpg",
+    image:
+      "/assets/uploads/whatsapp_image_2026-03-29_at_3.14.51_pm-019d390d-6876-72f8-8939-b5cdba9aa8e3-1.jpeg",
     title: "Every Voice Matters —",
     subtitle: "Speak Up, Seek Help",
     description:
@@ -73,7 +77,8 @@ export default function HeroCarousel() {
   return (
     <section
       id="home"
-      className="relative h-[90vh] min-h-[540px] overflow-hidden bg-pink-pale"
+      className="relative overflow-hidden bg-gray-900"
+      style={{ minHeight: "540px", height: "90vh" }}
     >
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
@@ -83,59 +88,66 @@ export default function HeroCarousel() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: `${direction * -120}vw`, opacity: 0 }}
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="absolute inset-0"
+          className="absolute inset-0 flex"
         >
-          {/* Background image */}
+          {/* Left: Photo fully contained, no cropping */}
           <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${slides[current].image}')` }}
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-deep/80 via-pink-medium/60 to-transparent" />
+            className="flex-1 flex items-center justify-center bg-black overflow-hidden"
+            style={{ maxWidth: "60%" }}
+          >
+            <img
+              src={slides[current].image}
+              alt={slides[current].title}
+              className="w-full h-full"
+              style={{ objectFit: "contain", objectPosition: "center" }}
+            />
+          </div>
 
-          {/* Content */}
-          <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-8 flex items-center">
-            <div className="max-w-2xl">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-4 border border-white/30">
-                  <Heart className="w-3 h-3 fill-white" />
-                  Mahila Pragati Sansthan
+          {/* Right: Text box fully contained inside the carousel */}
+          <div
+            className="flex items-center justify-center bg-black/80 p-6 sm:p-8"
+            style={{ width: "40%" }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="w-full max-w-sm"
+            >
+              <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-4 border border-white/30">
+                <Heart className="w-3 h-3 fill-white" />
+                Mahila Pragati Sansthan
+              </span>
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
+                {slides[current].title}
+                <br />
+                <span className="text-pink-300">
+                  {slides[current].subtitle}
                 </span>
-                <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                  {slides[current].title}
-                  <br />
-                  <span className="text-pink-300">
-                    {slides[current].subtitle}
-                  </span>
-                </h1>
-                <p className="mt-4 text-base sm:text-lg text-white/90 leading-relaxed max-w-lg">
-                  {slides[current].description}
-                </p>
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Button
-                    asChild
-                    className="bg-white text-primary font-bold rounded-full px-7 py-3 hover:bg-pink-pale shadow-pink-lg text-base"
-                    data-ocid="hero.primary_button"
-                  >
-                    <a href={slides[current].ctaHref}>{slides[current].cta}</a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="border-white text-white bg-transparent hover:bg-white/20 rounded-full px-7 py-3 text-base font-semibold"
-                    data-ocid="hero.secondary_button"
-                  >
-                    <a href={slides[current].secondaryHref}>
-                      {slides[current].secondary}
-                    </a>
-                  </Button>
-                </div>
-              </motion.div>
-            </div>
+              </h1>
+              <p className="mt-4 text-sm sm:text-base text-white/90 leading-relaxed">
+                {slides[current].description}
+              </p>
+              <div className="mt-6 flex flex-col gap-3">
+                <Button
+                  asChild
+                  className="bg-white text-primary font-bold rounded-full px-7 py-3 hover:bg-pink-pale shadow-pink-lg text-base"
+                  data-ocid="hero.primary_button"
+                >
+                  <a href={slides[current].ctaHref}>{slides[current].cta}</a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-white text-white bg-transparent hover:bg-white/20 rounded-full px-7 py-3 text-base font-semibold"
+                  data-ocid="hero.secondary_button"
+                >
+                  <a href={slides[current].secondaryHref}>
+                    {slides[current].secondary}
+                  </a>
+                </Button>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -161,7 +173,7 @@ export default function HeroCarousel() {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute bottom-14 left-1/4 -translate-x-1/2 z-20 flex gap-2">
         {slides.map((slide, i) => (
           <button
             type="button"

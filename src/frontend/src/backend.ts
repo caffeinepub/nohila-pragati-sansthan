@@ -107,6 +107,14 @@ export interface HelpRequest {
     message: string;
     phone: string;
 }
+export interface PendingRegistration {
+    principal: any;
+    name: string;
+    phoneNumber: string;
+    role: string;
+    utrNumber: string;
+    submittedAt: bigint;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -138,8 +146,13 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setQRCodeData(url: string, description: string): Promise<void>;
     submitHelpRequest(name: string, phone: string, message: string): Promise<bigint>;
+    submitPendingRegistration(name: string, phoneNumber: string, role: string, utrNumber: string): Promise<void>;
+    getAllPendingRegistrations(): Promise<Array<PendingRegistration>>;
+    approvePendingRegistration(utrNumber: string): Promise<void>;
+    rejectPendingRegistration(utrNumber: string): Promise<void>;
+    getMyPendingRegistration(): Promise<PendingRegistration | null>;
 }
-import type { QRCodeData as _QRCodeData, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { QRCodeData as _QRCodeData, UserProfile as _UserProfile, UserRole as _UserRole, PendingRegistration as _PendingRegistration } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -412,6 +425,76 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.submitHelpRequest(arg0, arg1, arg2);
             return result;
+        }
+    }
+    async submitPendingRegistration(arg0: string, arg1: string, arg2: string, arg3: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitPendingRegistration(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitPendingRegistration(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async getAllPendingRegistrations(): Promise<Array<PendingRegistration>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllPendingRegistrations();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllPendingRegistrations();
+            return result;
+        }
+    }
+    async approvePendingRegistration(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.approvePendingRegistration(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.approvePendingRegistration(arg0);
+            return result;
+        }
+    }
+    async rejectPendingRegistration(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.rejectPendingRegistration(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.rejectPendingRegistration(arg0);
+            return result;
+        }
+    }
+    async getMyPendingRegistration(): Promise<PendingRegistration | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyPendingRegistration();
+                return result.length === 0 ? null : result[0];
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyPendingRegistration();
+            return result.length === 0 ? null : result[0];
         }
     }
 }

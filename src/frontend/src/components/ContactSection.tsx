@@ -46,9 +46,15 @@ export default function ContactSection() {
                 <div>
                   <p className="font-semibold text-sm">Address</p>
                   <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                    Mahila Pragati Sansthan,
+                    618B Shyam Sundar Pally Main Road,
                     <br />
-                    India
+                    Shakuntala Park, Behala,
+                    <br />
+                    Kolkata – 700061
+                    <br />
+                    <span className="text-primary font-medium">
+                      We work all over India
+                    </span>
                   </p>
                 </div>
               </div>

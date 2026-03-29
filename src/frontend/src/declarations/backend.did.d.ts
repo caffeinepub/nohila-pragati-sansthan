@@ -28,6 +28,14 @@ export interface UserProfile {
   'registrationDate' : bigint,
   'phoneNumber' : string,
 }
+export interface PendingRegistration {
+  'principal' : Principal,
+  'name' : string,
+  'phoneNumber' : string,
+  'role' : string,
+  'utrNumber' : string,
+  'submittedAt' : bigint,
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -60,6 +68,11 @@ export interface _SERVICE {
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setQRCodeData' : ActorMethod<[string, string], undefined>,
   'submitHelpRequest' : ActorMethod<[string, string, string], bigint>,
+  'submitPendingRegistration' : ActorMethod<[string, string, string, string], undefined>,
+  'getAllPendingRegistrations' : ActorMethod<[], Array<PendingRegistration>>,
+  'approvePendingRegistration' : ActorMethod<[string], undefined>,
+  'rejectPendingRegistration' : ActorMethod<[string], undefined>,
+  'getMyPendingRegistration' : ActorMethod<[], [] | [PendingRegistration]>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

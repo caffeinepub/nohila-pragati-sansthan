@@ -1,21 +1,15 @@
 import {
   GraduationCap,
-  Home,
   Megaphone,
   Phone,
   Scale,
   Stethoscope,
+  Users,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useInView } from "../hooks/useInView";
 
 const services = [
-  {
-    icon: Home,
-    title: "Emergency Shelter",
-    desc: "Safe, immediate shelter for survivors and their children escaping dangerous situations. Available 24/7.",
-    color: "bg-pink-deep",
-  },
   {
     icon: Scale,
     title: "Legal Aid & Counseling",
@@ -30,7 +24,7 @@ const services = [
   },
   {
     icon: Phone,
-    title: "24/7 Helpline — 1091",
+    title: "24/7 Helpline — 9123905368",
     desc: "Round-the-clock crisis support line staffed by trained counselors. Confidential and free.",
     color: "bg-pink-deep",
   },
@@ -45,6 +39,12 @@ const services = [
     title: "Awareness Campaigns",
     desc: "Community outreach, school programs, and digital campaigns to educate and prevent domestic violence.",
     color: "bg-pink-rose",
+  },
+  {
+    icon: Users,
+    title: "Community Support",
+    desc: "Support groups, peer counseling, and networks connecting survivors with trained volunteers across India.",
+    color: "bg-pink-deep",
   },
 ];
 

@@ -1,4 +1,4 @@
-import { Heart, Scale, Shield, Users } from "lucide-react";
+import { Heart, Scale, Users, Wrench } from "lucide-react";
 import { motion } from "motion/react";
 import { useInView } from "../hooks/useInView";
 
@@ -9,19 +9,19 @@ const pillars = [
     desc: "We put survivors at the heart of everything we do — providing compassionate, trauma-informed support.",
   },
   {
-    icon: Shield,
-    title: "Safe Spaces",
-    desc: "Emergency shelter and safe houses where survivors can rebuild their lives free from fear.",
-  },
-  {
     icon: Scale,
     title: "Legal Empowerment",
     desc: "Free legal aid, court accompaniment, and rights education to help survivors seek justice.",
   },
   {
+    icon: Wrench,
+    title: "Skill Development",
+    desc: "Vocational training, income-generation programs, and workshops to help survivors become self-reliant.",
+  },
+  {
     icon: Users,
     title: "Community Healing",
-    desc: "Group therapy, skill-building programs, and community support networks for long-term recovery.",
+    desc: "Group therapy, peer counseling, and community support networks for long-term recovery.",
   },
 ];
 

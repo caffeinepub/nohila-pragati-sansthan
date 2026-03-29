@@ -13,22 +13,27 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-3">
               <img
-                src="/assets/generated/nps-logo-transparent.dim_200x200.png"
+                src="/assets/uploads/logo-019d38f8-44b7-73ae-9933-5c181b2868e1-3.jpeg"
                 alt="Logo"
-                className="w-10 h-10 object-contain opacity-90"
+                className="w-12 h-12 object-contain rounded-full opacity-90"
               />
               <div>
                 <p className="font-display font-bold text-sm leading-tight">
                   Mahila Pragati Sansthan
                 </p>
-                <p className="text-xs text-white/60">
+                <p className="text-xs text-white/80">
                   Empowering Survivors Since 2019
                 </p>
               </div>
             </div>
-            <p className="text-sm text-white/70 leading-relaxed max-w-xs">
+            <p className="text-sm text-white/85 leading-relaxed max-w-xs">
               A registered NGO dedicated to ending domestic violence through
-              support, advocacy, and community healing.
+              support, advocacy, and community healing across India.
+            </p>
+            <p className="text-xs text-white/60 mt-2">
+              618B Shyam Sundar Pally Main Road, Shakuntala Park,
+              <br />
+              Behala, Kolkata – 700061
             </p>
             <a
               href="tel:9123905368"
@@ -40,22 +45,23 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-sm mb-4 text-white/90">
+            <h4 className="font-semibold text-sm mb-4 text-white">
               Quick Links
             </h4>
             <ul className="space-y-2">
               {[
-                { label: "Home", href: "#home" },
-                { label: "About Us", href: "#about" },
-                { label: "Our Services", href: "#services" },
-                { label: "Impact", href: "#impact" },
-                { label: "Get Help", href: "#help" },
-                { label: "Contact", href: "#contact" },
+                { label: "Home", href: "/" },
+                { label: "About Us", href: "/#about" },
+                { label: "Our Services", href: "/#services" },
+                { label: "Impact", href: "/#impact" },
+                { label: "Get Help", href: "/#help" },
+                { label: "Donate", href: "/donate" },
+                { label: "Contact", href: "/#contact" },
               ].map((l) => (
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    className="text-sm text-white/60 hover:text-pink-rose transition-colors"
+                    className="text-sm text-white/80 hover:text-pink-rose transition-colors"
                   >
                     {l.label}
                   </a>
@@ -66,7 +72,7 @@ export default function Footer() {
 
           {/* Emergency */}
           <div>
-            <h4 className="font-semibold text-sm mb-4 text-white/90">
+            <h4 className="font-semibold text-sm mb-4 text-white">
               Emergency Contacts
             </h4>
             <ul className="space-y-3">
@@ -80,7 +86,7 @@ export default function Footer() {
                   key={c.number}
                   className="flex items-center justify-between"
                 >
-                  <span className="text-xs text-white/60">{c.label}</span>
+                  <span className="text-xs text-white/80">{c.label}</span>
                   <a
                     href={`tel:${c.number}`}
                     className="text-sm font-bold text-pink-rose hover:text-white transition-colors"
@@ -93,7 +99,7 @@ export default function Footer() {
             <div className="mt-4">
               <a
                 href="mailto:mahilapragati444@gmail.com"
-                className="text-xs text-white/60 hover:text-pink-rose transition-colors break-all"
+                className="text-xs text-white/80 hover:text-pink-rose transition-colors break-all"
               >
                 mahilapragati444@gmail.com
               </a>
@@ -101,7 +107,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
+        <div className="border-t border-white/15 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/75">
           <p>© {year} Mahila Pragati Sansthan. All rights reserved.</p>
           <p className="flex items-center gap-1">
             Built with{" "}

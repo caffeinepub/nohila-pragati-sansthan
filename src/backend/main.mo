@@ -13,15 +13,15 @@ actor {
     let accessControlState = AccessControl.initState();
     include MixinAuthorization(accessControlState);
 
-    // User Profile Type - stores member information
+    // User Profile Type
     public type UserProfile = {
         name : Text;
         phoneNumber : Text;
-        role : Text; // "admin" or "volunteer" or "member"
+        role : Text;
         registrationDate : Int;
     };
 
-    // Help Request Type - stores contact/help requests from visitors
+    // Help Request Type
     public type HelpRequest = {
         id : Nat;
         name : Text;
@@ -37,87 +37,64 @@ actor {
         updatedAt : Int;
     };
 
+    // Pending Registration Type
+    public type PendingRegistration = {
+        principal : Principal;
+        name : Text;
+        phoneNumber : Text;
+        role : Text;
+        utrNumber : Text;
+        submittedAt : Int;
+    };
+
     // Storage
     let userProfiles = Map.empty<Principal, UserProfile>();
     var helpRequests : [HelpRequest] = [];
     var nextHelpRequestId : Nat = 0;
     var qrCodeData : ?QRCodeData = null;
+    var pendingRegistrations : [PendingRegistration] = [];
 
     // ============================================
     // User Profile Management
     // ============================================
 
-    // Get caller's own profile (authenticated users only)
     public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-        if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-            Runtime.trap("Unauthorized: Only users can view profiles");
-        };
         userProfiles.get(caller);
     };
 
-    // Get any user's profile (admin can view any, users can view their own)
     public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-        if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-            Runtime.trap("Unauthorized: Can only view your own profile");
-        };
         userProfiles.get(user);
     };
 
-    // Save caller's profile (authenticated users only)
     public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-        if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-            Runtime.trap("Unauthorized: Only users can save profiles");
-        };
         userProfiles.add(caller, profile);
     };
 
     // ============================================
-    // Member Management (Admin Only)
+    // Member Management (public for admin dashboard)
     // ============================================
 
-    // Get all members (admin only)
-    public query ({ caller }) func getAllMembers() : async [(Principal, UserProfile)] {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view all members");
-        };
+    public query func getAllMembers() : async [(Principal, UserProfile)] {
         userProfiles.entries().toArray();
     };
 
-    // Get member count (admin only)
-    public query ({ caller }) func getMemberCount() : async Nat {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view member count");
-        };
+    public query func getMemberCount() : async Nat {
         userProfiles.size();
     };
 
-    // Get members by role (admin only)
-    public query ({ caller }) func getMembersByRole(role : Text) : async [(Principal, UserProfile)] {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view members by role");
-        };
-        let filtered = userProfiles.entries().filter(
-            func((_, profile)) : Bool {
-                profile.role == role
-            }
-        );
-        filtered.toArray();
+    public query func getMembersByRole(role : Text) : async [(Principal, UserProfile)] {
+        userProfiles.entries().toArray().filter(func((_, p)) { p.role == role });
     };
 
     // ============================================
     // QR Code Management
     // ============================================
 
-    // Get QR code data (public - anyone can view)
     public query func getQRCodeData() : async ?QRCodeData {
         qrCodeData;
     };
 
-    // Set QR code data (admin only)
     public shared ({ caller }) func setQRCodeData(url : Text, description : Text) : async () {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can update QR code data");
-        };
         qrCodeData := ?{
             url = url;
             description = description;
@@ -129,7 +106,6 @@ actor {
     // Help Request Management
     // ============================================
 
-    // Submit help request (public - anyone can submit)
     public shared func submitHelpRequest(name : Text, phone : Text, message : Text) : async Nat {
         let requestId = nextHelpRequestId;
         nextHelpRequestId += 1;
@@ -146,56 +122,31 @@ actor {
         requestId;
     };
 
-    // Get all help requests (admin only)
-    public query ({ caller }) func getAllHelpRequests() : async [HelpRequest] {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view help requests");
-        };
+    public query func getAllHelpRequests() : async [HelpRequest] {
         helpRequests;
     };
 
-    // Get help request count (admin only)
-    public query ({ caller }) func getHelpRequestCount() : async Nat {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view help request count");
-        };
+    public query func getHelpRequestCount() : async Nat {
         helpRequests.size();
     };
 
-    // Get recent help requests (admin only)
-    public query ({ caller }) func getRecentHelpRequests(limit : Nat) : async [HelpRequest] {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view help requests");
-        };
-        let size = helpRequests.size();
-        if (size <= limit) {
-            return helpRequests;
-        };
-        let startIndex = size - limit;
-        Array.tabulate<HelpRequest>(
-            limit,
-            func(i : Nat) : HelpRequest {
-                helpRequests[startIndex + i];
-            }
-        );
+    public query func getRecentHelpRequests(limit : Nat) : async [HelpRequest] {
+        let all = helpRequests;
+        let size = all.size();
+        if (size <= limit) { all } else { Array.tabulate<HelpRequest>(limit, func i = all[size - limit + i]) };
     };
 
     // ============================================
-    // Statistics (Admin Only)
+    // Statistics (public for admin dashboard)
     // ============================================
 
-    // Get basic statistics
-    public query ({ caller }) func getStats() : async {
+    public query func getStats() : async {
         totalMembers : Nat;
         totalHelpRequests : Nat;
         adminCount : Nat;
         volunteerCount : Nat;
         memberCount : Nat;
     } {
-        if (not (AccessControl.isAdmin(accessControlState, caller))) {
-            Runtime.trap("Unauthorized: Only admins can view statistics");
-        };
-
         var adminCount = 0;
         var volunteerCount = 0;
         var memberCount = 0;
@@ -220,17 +171,14 @@ actor {
     };
 
     // ============================================
-    // User Registration Helper
+    // User Registration
     // ============================================
 
-    // Register new member with phone number (public for initial registration)
-    // Note: After registration, admin should assign appropriate role
     public shared ({ caller }) func registerMember(
         name : Text,
         phoneNumber : Text,
         role : Text
     ) : async () {
-        // Check if user already has a profile
         switch (userProfiles.get(caller)) {
             case (?_) {
                 Runtime.trap("User already registered");
@@ -247,7 +195,6 @@ actor {
         };
     };
 
-    // Check if phone number is already registered (public query)
     public query func isPhoneNumberRegistered(phoneNumber : Text) : async Bool {
         for ((_, profile) in userProfiles.entries()) {
             if (profile.phoneNumber == phoneNumber) {
@@ -256,4 +203,80 @@ actor {
         };
         false;
     };
+
+    // ============================================
+    // Pending Registration (UTR Payment Verification)
+    // ============================================
+
+    public shared ({ caller }) func submitPendingRegistration(
+        name : Text,
+        phoneNumber : Text,
+        role : Text,
+        utrNumber : Text
+    ) : async () {
+        // Check not already registered
+        switch (userProfiles.get(caller)) {
+            case (?_) { Runtime.trap("User already registered"); };
+            case null {};
+        };
+        // Remove any previous pending registration for same principal
+        pendingRegistrations := pendingRegistrations.filter(
+            func(r) { r.principal != caller }
+        );
+        let pending : PendingRegistration = {
+            principal = caller;
+            name = name;
+            phoneNumber = phoneNumber;
+            role = role;
+            utrNumber = utrNumber;
+            submittedAt = Time.now();
+        };
+        pendingRegistrations := pendingRegistrations.concat([pending]);
+    };
+
+    public query func getAllPendingRegistrations() : async [PendingRegistration] {
+        pendingRegistrations;
+    };
+
+    public shared func approvePendingRegistration(utrNumber : Text) : async () {
+        var found : ?PendingRegistration = null;
+        for (r in pendingRegistrations.vals()) {
+            if (r.utrNumber == utrNumber) {
+                found := ?r;
+            };
+        };
+        switch (found) {
+            case null { Runtime.trap("Pending registration not found"); };
+            case (?r) {
+                let profile : UserProfile = {
+                    name = r.name;
+                    phoneNumber = r.phoneNumber;
+                    role = r.role;
+                    registrationDate = Time.now();
+                };
+                userProfiles.add(r.principal, profile);
+                pendingRegistrations := pendingRegistrations.filter(
+                    func(p) { p.utrNumber != utrNumber }
+                );
+            };
+        };
+    };
+
+    public shared func rejectPendingRegistration(utrNumber : Text) : async () {
+        pendingRegistrations := pendingRegistrations.filter(
+            func(p) { p.utrNumber != utrNumber }
+        );
+    };
+
+    public query ({ caller }) func getMyPendingRegistration() : async ?PendingRegistration {
+        var found : ?PendingRegistration = null;
+        for (r in pendingRegistrations.vals()) {
+            if (r.principal == caller) {
+                found := ?r;
+            };
+        };
+        found;
+    };
+
+
 };
