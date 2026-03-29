@@ -42,6 +42,8 @@ const workItems: WorkItem[] = [
     title: "Relief for the Elderly",
     description:
       "Special care packages and meals for elderly citizens living alone.",
+    image:
+      "/assets/uploads/whatsapp_image_2026-03-29_at_3.14.51_pm-019d390d-6876-72f8-8939-b5cdba9aa8e3-1.jpeg",
     emoji: "👵",
   },
   {
@@ -50,6 +52,8 @@ const workItems: WorkItem[] = [
     title: "Community Kitchen",
     description:
       "Weekly community kitchen serving nutritious food to those in need.",
+    video:
+      "/assets/uploads/communitykitchen-019d3a6e-dbb3-700e-8041-ba4ff0d12cc4-1.mp4",
     emoji: "🥘",
   },
   {
@@ -58,6 +62,8 @@ const workItems: WorkItem[] = [
     title: "Winter Aid Camp",
     description:
       "Annual camp providing essentials including food, clothing, and hygiene kits.",
+    video:
+      "/assets/uploads/winteraid_1-019d3a70-9dfc-7211-a139-3c4851586cda-4.mp4",
     emoji: "❄️",
   },
   // Gangasagar Mela
@@ -77,23 +83,9 @@ const workItems: WorkItem[] = [
     title: "Pilgrim Shelter Setup",
     description:
       "Safe and clean temporary shelters arranged for over 10,000 pilgrims.",
+    video:
+      "/assets/uploads/pilgrimshelter-019d3a4f-063c-764e-b26e-9239fa1e4f27-2.mp4",
     emoji: "⛺",
-  },
-  {
-    id: 8,
-    category: "gangasagar",
-    title: "Medical Aid Post",
-    description:
-      "On-site medical volunteers attending to pilgrims' health needs during the mela.",
-    emoji: "🏥",
-  },
-  {
-    id: 9,
-    category: "gangasagar",
-    title: "Lost & Found Support",
-    description:
-      "Helping pilgrims reconnect with separated family members at the crowded Mela.",
-    emoji: "🔍",
   },
   {
     id: 10,
@@ -101,6 +93,8 @@ const workItems: WorkItem[] = [
     title: "Prasad & Sacred Offerings",
     description:
       "Organizing the distribution of prasad and sacred items to all pilgrims.",
+    video:
+      "/assets/uploads/prasad_1-019d3a70-9cd2-7368-b89f-890938b5f9e6-3.mp4",
     emoji: "🌸",
   },
   // Weddings
@@ -110,33 +104,7 @@ const workItems: WorkItem[] = [
     title: "Wedding Support Services",
     description:
       "Comprehensive support at weddings across all castes, religions, and communities.",
-    image:
-      "/assets/uploads/whatsapp_image_2026-03-29_at_3.14.51_pm-019d390d-6876-72f8-8939-b5cdba9aa8e3-1.jpeg",
     emoji: "💍",
-  },
-  {
-    id: 12,
-    category: "weddings",
-    title: "Inter-Community Weddings",
-    description:
-      "Facilitating dignified weddings between families from different religions and communities.",
-    emoji: "🕌",
-  },
-  {
-    id: 13,
-    category: "weddings",
-    title: "Underprivileged Brides",
-    description:
-      "Sponsoring and supporting weddings for underprivileged brides with no family support.",
-    emoji: "👰",
-  },
-  {
-    id: 14,
-    category: "weddings",
-    title: "Volunteer Wedding Crew",
-    description:
-      "Trained volunteers helping with logistics, decoration, and hospitality at ceremonies.",
-    emoji: "🎊",
   },
   {
     id: 15,

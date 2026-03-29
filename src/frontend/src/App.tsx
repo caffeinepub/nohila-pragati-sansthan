@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useState } from "react";
 import AboutSection from "./components/AboutSection";
 import AdminDashboard from "./components/AdminDashboard";
+import CasesSolvedPage from "./components/CasesSolvedPage";
 import ContactSection from "./components/ContactSection";
 import DonatePage from "./components/DonatePage";
 import Footer from "./components/Footer";
@@ -26,6 +27,7 @@ export default function App() {
     if (path.startsWith("/gangasagar")) return "gangasagar";
     if (path.startsWith("/weddings")) return "weddings";
     if (path.startsWith("/our-work")) return "our-work";
+    if (path.startsWith("/cases-solved")) return "cases-solved";
     return "home";
   });
 
@@ -96,6 +98,15 @@ export default function App() {
       <>
         <Toaster richColors position="top-right" />
         <OurWorkPage />
+      </>
+    );
+  }
+
+  if (currentPage === "cases-solved") {
+    return (
+      <>
+        <Toaster richColors position="top-right" />
+        <CasesSolvedPage />
       </>
     );
   }

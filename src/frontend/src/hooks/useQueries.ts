@@ -5,6 +5,7 @@ import type {
   QRCodeData,
   UserProfile,
 } from "../backend";
+import { createActorWithConfig } from "../config";
 import { useActor } from "./useActor";
 
 export type { PendingRegistration };
@@ -164,8 +165,9 @@ export function useSubmitPendingRegistration() {
       role: string;
       utrNumber: string;
     }) => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.submitPendingRegistration(
+      // Use the actor from the hook if available, otherwise create a fresh anonymous actor
+      const resolvedActor = actor ?? (await createActorWithConfig());
+      return resolvedActor.submitPendingRegistration(
         name,
         phoneNumber,
         role,

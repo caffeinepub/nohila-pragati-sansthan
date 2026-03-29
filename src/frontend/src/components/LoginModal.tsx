@@ -306,7 +306,7 @@ export default function LoginModal({ open, onClose }: Props) {
                       <div className="flex justify-center">
                         <div className="border-2 border-pink-200 rounded-xl overflow-hidden w-44 h-44 bg-white flex items-center justify-center p-1">
                           <img
-                            src="/assets/uploads/whatsapp_image_2026-03-29_at_5.12.13_pm-019d397e-5b05-7188-8bee-aa8000aac93c-2.jpeg"
+                            src="/assets/uploads/whatsapp_image_2026-03-29_at_7.18.05_pm-019d3a8f-811c-765e-82b1-01e0b907e762-1.jpeg"
                             alt="Payment QR Code"
                             className="w-full h-full object-contain"
                           />

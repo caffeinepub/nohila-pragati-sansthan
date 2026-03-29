@@ -22,6 +22,7 @@ const ourWorkLinks = [
   { label: "Food & Welfare", href: "/welfare" },
   { label: "Gangasagar Mela", href: "/gangasagar" },
   { label: "Weddings", href: "/weddings" },
+  { label: "Cases Solved", href: "/cases-solved" },
 ];
 
 export default function Navbar() {
