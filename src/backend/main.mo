@@ -54,6 +54,28 @@ actor {
     var qrCodeData : ?QRCodeData = null;
     var pendingRegistrations : [PendingRegistration] = [];
 
+    // Special roles that can only have one person
+    let specialRoles : [Text] = ["president", "treasurer"];
+
+    func isSpecialRole(role : Text) : Bool {
+        for (r in specialRoles.vals()) {
+            if (r == role) return true;
+        };
+        false;
+    };
+
+    func isSpecialRoleTaken(role : Text) : Bool {
+        // Check approved members
+        for ((_, profile) in userProfiles.entries()) {
+            if (profile.role == role) return true;
+        };
+        // Check pending registrations
+        for (r in pendingRegistrations.vals()) {
+            if (r.role == role) return true;
+        };
+        false;
+    };
+
     // ============================================
     // User Profile Management
     // ============================================
@@ -84,6 +106,20 @@ actor {
 
     public query func getMembersByRole(role : Text) : async [(Principal, UserProfile)] {
         userProfiles.entries().toArray().filter(func((_, p)) { p.role == role });
+    };
+
+    // ============================================
+    // Special Roles
+    // ============================================
+
+    public query func getOccupiedSpecialRoles() : async [Text] {
+        var occupied : [Text] = [];
+        for (role in specialRoles.vals()) {
+            if (isSpecialRoleTaken(role)) {
+                occupied := occupied.concat([role]);
+            };
+        };
+        occupied;
     };
 
     // ============================================
@@ -219,6 +255,10 @@ actor {
             case (?_) { Runtime.trap("User already registered"); };
             case null {};
         };
+        // Check special role availability
+        if (isSpecialRole(role) and isSpecialRoleTaken(role)) {
+            Runtime.trap("The " # role # " position has already been filled.");
+        };
         // Remove any previous pending registration for same principal
         pendingRegistrations := pendingRegistrations.filter(
             func(r) { r.principal != caller }
@@ -248,6 +288,20 @@ actor {
         switch (found) {
             case null { Runtime.trap("Pending registration not found"); };
             case (?r) {
+                // Re-check special role uniqueness at approval time
+                if (isSpecialRole(r.role)) {
+                    // Temporarily remove this pending reg to check against others
+                    let othersWithRole = pendingRegistrations.filter(
+                        func(p) { p.utrNumber != utrNumber and p.role == r.role }
+                    );
+                    var alreadyApproved = false;
+                    for ((_, profile) in userProfiles.entries()) {
+                        if (profile.role == r.role) alreadyApproved := true;
+                    };
+                    if (alreadyApproved) {
+                        Runtime.trap("The " # r.role # " position has already been filled by another member.");
+                    };
+                };
                 let profile : UserProfile = {
                     name = r.name;
                     phoneNumber = r.phoneNumber;
@@ -278,5 +332,16 @@ actor {
         found;
     };
 
+    // ============================================
+    // Admin: Clear all user data
+    // ============================================
+
+    public shared func clearAllData() : async () {
+        let principals = userProfiles.keys().toArray();
+        for (principal in principals.vals()) {
+            ignore userProfiles.remove(principal);
+        };
+        pendingRegistrations := [];
+    };
 
 };

@@ -18,13 +18,16 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Crown,
   FileText,
   Loader2,
   LogIn,
   LogOut,
   MessageSquare,
   Shield,
+  Trash2,
   Users,
+  Wallet,
   XCircle,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -32,9 +35,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   useApprovePendingRegistration,
+  useClearAllData,
   useGetAllHelpRequests,
   useGetAllMembers,
   useGetAllPendingRegistrations,
+  useGetOccupiedSpecialRoles,
   useGetStats,
   useRejectPendingRegistration,
 } from "../hooks/useQueries";
@@ -225,22 +230,29 @@ function PendingRegistrationsTab() {
   const { data: pendingList, isLoading } = useGetAllPendingRegistrations();
   const approveMutation = useApprovePendingRegistration();
   const rejectMutation = useRejectPendingRegistration();
+  const [processingUtr, setProcessingUtr] = useState<string | null>(null);
 
   const handleApprove = async (utrNumber: string, name: string) => {
+    setProcessingUtr(utrNumber);
     try {
       await approveMutation.mutateAsync(utrNumber);
       toast.success(`${name} approved and registered successfully.`);
-    } catch {
-      toast.error("Failed to approve registration. Please try again.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to approve registration.");
+    } finally {
+      setProcessingUtr(null);
     }
   };
 
   const handleReject = async (utrNumber: string, name: string) => {
+    setProcessingUtr(utrNumber);
     try {
       await rejectMutation.mutateAsync(utrNumber);
       toast.success(`Registration for ${name} rejected.`);
     } catch {
-      toast.error("Failed to reject registration. Please try again.");
+      toast.error("Failed to reject registration.");
+    } finally {
+      setProcessingUtr(null);
     }
   };
 
@@ -300,88 +312,153 @@ function PendingRegistrationsTab() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pendingList.map((reg, i) => (
-                  <TableRow
-                    key={reg.utrNumber}
-                    className="hover:bg-pink-pale/20"
-                    data-ocid={`admin.row.item.${i + 1}`}
-                  >
-                    <TableCell className="text-foreground/40 text-sm">
-                      {i + 1}
-                    </TableCell>
-                    <TableCell className="font-medium">{reg.name}</TableCell>
-                    <TableCell className="text-sm text-foreground/70">
-                      {reg.phoneNumber}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="secondary"
-                        className="text-xs capitalize bg-pink-pale text-primary"
-                      >
-                        {reg.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {reg.utrNumber}
-                    </TableCell>
-                    <TableCell className="text-sm text-foreground/60">
-                      {new Date(
-                        Number(reg.submittedAt) / 1_000_000,
-                      ).toLocaleDateString("en-IN", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleApprove(reg.utrNumber, reg.name)}
-                          disabled={
-                            approveMutation.isPending ||
-                            rejectMutation.isPending
-                          }
-                          className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 h-7 rounded-full"
-                          data-ocid="admin.confirm_button"
+                {pendingList.map((reg, i) => {
+                  const isProcessing = processingUtr === reg.utrNumber;
+                  return (
+                    <TableRow
+                      key={reg.utrNumber}
+                      className="hover:bg-pink-pale/20"
+                      data-ocid={`admin.row.item.${i + 1}`}
+                    >
+                      <TableCell className="text-foreground/40 text-sm">
+                        {i + 1}
+                      </TableCell>
+                      <TableCell className="font-medium">{reg.name}</TableCell>
+                      <TableCell className="text-sm text-foreground/70">
+                        {reg.phoneNumber}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="text-xs capitalize bg-pink-pale text-primary"
                         >
-                          {approveMutation.isPending ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <>
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
-                              Approve
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleReject(reg.utrNumber, reg.name)}
-                          disabled={
-                            approveMutation.isPending ||
-                            rejectMutation.isPending
-                          }
-                          className="text-xs px-3 h-7 rounded-full"
-                          data-ocid="admin.delete_button"
-                        >
-                          {rejectMutation.isPending ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <>
-                              <XCircle className="w-3 h-3 mr-1" />
-                              Reject
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          {reg.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {reg.utrNumber}
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground/60">
+                        {new Date(
+                          Number(reg.submittedAt) / 1_000_000,
+                        ).toLocaleDateString("en-IN", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              handleApprove(reg.utrNumber, reg.name)
+                            }
+                            disabled={isProcessing || processingUtr !== null}
+                            className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 h-7 rounded-full"
+                            data-ocid="admin.confirm_button"
+                          >
+                            {isProcessing ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <>
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Approve
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              handleReject(reg.utrNumber, reg.name)
+                            }
+                            disabled={isProcessing || processingUtr !== null}
+                            className="text-xs px-3 h-7 rounded-full"
+                            data-ocid="admin.delete_button"
+                          >
+                            {isProcessing ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <>
+                                <XCircle className="w-3 h-3 mr-1" />
+                                Reject
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SettingsTab() {
+  const clearAllData = useClearAllData();
+
+  const handleClearAll = async () => {
+    const confirmed = window.confirm(
+      "WARNING: This will permanently delete ALL registered users and pending registrations. This cannot be undone. Are you absolutely sure?",
+    );
+    if (!confirmed) return;
+    try {
+      await clearAllData.mutateAsync();
+      toast.success("All users and registrations have been cleared.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to clear data.");
+    }
+  };
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
+          <Shield className="w-4 h-4 text-primary" /> Settings
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="border border-destructive/30 rounded-xl p-5 bg-destructive/5">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 bg-destructive/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Trash2 className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-destructive text-sm">
+                Danger Zone
+              </h3>
+              <p className="text-xs text-foreground/60 mt-1">
+                This will permanently delete ALL registered users and pending
+                registrations. This cannot be undone.
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={handleClearAll}
+            disabled={clearAllData.isPending}
+            variant="destructive"
+            className="w-full rounded-full"
+            data-ocid="admin.delete_button"
+          >
+            {clearAllData.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Clearing...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear All Users &amp; Registrations
+              </>
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
@@ -393,6 +470,7 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
   const { data: helpRequests, isLoading: requestsLoading } =
     useGetAllHelpRequests();
   const { data: pendingList } = useGetAllPendingRegistrations();
+  const { data: occupiedRoles = [] } = useGetOccupiedSpecialRoles();
 
   const totalMembers = stats ? Number(stats.totalMembers) : null;
   const volunteers = stats ? Number(stats.volunteerCount) : null;
@@ -400,6 +478,20 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
   const requestsCount = stats ? Number(stats.totalHelpRequests) : null;
   const pendingCount = pendingList ? pendingList.length : null;
   const overviewLoading = statsLoading;
+
+  // Find president/treasurer names from approved members
+  const presidentMember = members?.find(([, p]) => p.role === "president");
+  const treasurerMember = members?.find(([, p]) => p.role === "treasurer");
+  const presidentName = presidentMember
+    ? presidentMember[1].name
+    : occupiedRoles.includes("president")
+      ? "Appointed"
+      : "Vacant";
+  const treasurerName = treasurerMember
+    ? treasurerMember[1].name
+    : occupiedRoles.includes("treasurer")
+      ? "Appointed"
+      : "Vacant";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -443,7 +535,7 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white border border-border rounded-xl p-1 gap-1 h-auto">
+          <TabsList className="bg-white border border-border rounded-xl p-1 gap-1 h-auto flex-wrap">
             <TabsTrigger
               value="overview"
               className="rounded-lg data-[state=active]:bg-pink-gradient data-[state=active]:text-white text-sm"
@@ -477,11 +569,18 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
             >
               Help Requests
             </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="rounded-lg data-[state=active]:bg-pink-gradient data-[state=active]:text-white text-sm"
+              data-ocid="admin.tab"
+            >
+              Settings
+            </TabsTrigger>
           </TabsList>
 
           {/* Overview */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-7 gap-4">
               <StatCard
                 icon={<Users className="w-5 h-5 text-white" />}
                 label="Total Members"
@@ -506,6 +605,16 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                 icon={<Clock className="w-5 h-5 text-white" />}
                 label="Pending Approvals"
                 value={pendingCount ?? "--"}
+              />
+              <StatCard
+                icon={<Crown className="w-5 h-5 text-white" />}
+                label="President"
+                value={membersLoading ? "..." : presidentName}
+              />
+              <StatCard
+                icon={<Wallet className="w-5 h-5 text-white" />}
+                label="Treasurer"
+                value={membersLoading ? "..." : treasurerName}
               />
             </div>
           </TabsContent>
@@ -587,7 +696,11 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                                     ? "bg-pink-pale text-primary"
                                     : profile.role === "counselor"
                                       ? "bg-secondary text-secondary-foreground"
-                                      : "bg-muted text-muted-foreground"
+                                      : profile.role === "president"
+                                        ? "bg-amber-100 text-amber-800"
+                                        : profile.role === "treasurer"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : "bg-muted text-muted-foreground"
                                 }`}
                               >
                                 {profile.role}
@@ -707,6 +820,11 @@ function DashboardContent({ onLogout }: { onLogout: () => void }) {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Settings */}
+          <TabsContent value="settings">
+            <SettingsTab />
           </TabsContent>
         </Tabs>
       </main>

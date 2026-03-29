@@ -68,4 +68,6 @@ export interface backendInterface {
     approvePendingRegistration(utrNumber: string): Promise<void>;
     rejectPendingRegistration(utrNumber: string): Promise<void>;
     getMyPendingRegistration(): Promise<PendingRegistration | null>;
+    getOccupiedSpecialRoles(): Promise<Array<string>>;
+    clearAllData(): Promise<void>;
 }

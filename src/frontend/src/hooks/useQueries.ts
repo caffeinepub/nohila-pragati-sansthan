@@ -165,7 +165,6 @@ export function useSubmitPendingRegistration() {
       role: string;
       utrNumber: string;
     }) => {
-      // Use the actor from the hook if available, otherwise create a fresh anonymous actor
       const resolvedActor = actor ?? (await createActorWithConfig());
       return resolvedActor.submitPendingRegistration(
         name,
@@ -216,6 +215,7 @@ export function useApprovePendingRegistration() {
       queryClient.invalidateQueries({ queryKey: ["allPendingRegistrations"] });
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["occupiedSpecialRoles"] });
     },
   });
 }
@@ -230,6 +230,36 @@ export function useRejectPendingRegistration() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allPendingRegistrations"] });
+    },
+  });
+}
+
+export function useGetOccupiedSpecialRoles() {
+  const { actor, isFetching } = useActor();
+  return useQuery<string[]>({
+    queryKey: ["occupiedSpecialRoles"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return (actor as any).getOccupiedSpecialRoles();
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 30_000,
+  });
+}
+
+export function useClearAllData() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return (actor as any).clearAllData();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allMembers"] });
+      queryClient.invalidateQueries({ queryKey: ["allPendingRegistrations"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["occupiedSpecialRoles"] });
     },
   });
 }

@@ -32,6 +32,7 @@ import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useGetCallerUserProfile,
   useGetMyPendingRegistration,
+  useGetOccupiedSpecialRoles,
   useSubmitPendingRegistration,
 } from "../hooks/useQueries";
 
@@ -52,6 +53,7 @@ export default function LoginModal({ open, onClose }: Props) {
     useGetCallerUserProfile();
   const { data: pendingReg, isLoading: pendingLoading } =
     useGetMyPendingRegistration();
+  const { data: occupiedRoles = [] } = useGetOccupiedSpecialRoles();
   const submitPendingMutation = useSubmitPendingRegistration();
 
   const [name, setName] = useState("");
@@ -427,6 +429,24 @@ export default function LoginModal({ open, onClose }: Props) {
                             <SelectItem value="member">Member</SelectItem>
                             <SelectItem value="volunteer">Volunteer</SelectItem>
                             <SelectItem value="counselor">Counselor</SelectItem>
+                            <SelectItem
+                              value="president"
+                              disabled={occupiedRoles.includes("president")}
+                            >
+                              President
+                              {occupiedRoles.includes("president")
+                                ? " (Position Filled)"
+                                : ""}
+                            </SelectItem>
+                            <SelectItem
+                              value="treasurer"
+                              disabled={occupiedRoles.includes("treasurer")}
+                            >
+                              Treasurer
+                              {occupiedRoles.includes("treasurer")
+                                ? " (Position Filled)"
+                                : ""}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
