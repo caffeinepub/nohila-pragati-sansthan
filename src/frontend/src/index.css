@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 100 0 0;
+    --foreground: 20 0.04 10;
+    --card: 98 0.01 350;
+    --card-foreground: 20 0.04 10;
+    --popover: 100 0 0;
+    --popover-foreground: 20 0.04 10;
+    --primary: 0.52 0.22 0;
+    --primary-foreground: 100 0 0;
+    --secondary: 0.93 0.05 350;
+    --secondary-foreground: 0.35 0.12 0;
+    --muted: 0.95 0.02 350;
+    --muted-foreground: 0.55 0.06 10;
+    --accent: 0.88 0.08 350;
+    --accent-foreground: 0.35 0.12 0;
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 100 0 0;
+    --border: 0.9 0.04 350;
+    --input: 0.9 0.04 350;
+    --ring: 0.52 0.22 0;
+    --radius: 0.75rem;
+    --pink-deep: 0.52 0.22 0;
+    --pink-medium: 0.65 0.18 0;
+    --pink-light: 0.88 0.08 350;
+    --pink-pale: 0.95 0.03 350;
+    --pink-rose: 0.72 0.14 350;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .text-gradient-pink {
+    background: linear-gradient(
+      135deg,
+      oklch(0.52 0.22 0),
+      oklch(0.72 0.14 350)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .bg-pink-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(0.52 0.22 0) 0%,
+      oklch(0.72 0.14 350) 100%
+    );
+  }
+  .bg-pink-gradient-soft {
+    background: linear-gradient(
+      135deg,
+      oklch(0.88 0.08 350) 0%,
+      oklch(0.95 0.03 350) 100%
+    );
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-pink;
+  }
+}
